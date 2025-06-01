@@ -2,47 +2,28 @@
 <resources>
 
     <!-- ===================================================================== -->
-    <!-- TEMA PRINCIPAL VUZIX BLADE - FOCO EM MINT GREEN + TRANSPARÊNCIA       -->
-    <!-- Background: BLACK (transparente) | Texto/Ícones: MINT GREEN + WHITE   -->
+    <!-- TEMA PRINCIPAL VUZIX BLADE - COMPATÍVEL COM API 22                   -->
+    <!-- Baseado em AppCompat para compatibilidade com Android 5.1.1          -->
     <!-- ===================================================================== -->
 
     <style name="Theme.VuzixBladeApp" parent="Theme.AppCompat.NoActionBar">
-        <!-- COR PRINCIPAL: MINT GREEN VUZIX -->
-        <item name="colorPrimary">#00FF88</item>        <!-- Verde Mint - cor oficial Vuzix -->
-        <item name="colorPrimaryDark">#00CC66</item>    <!-- Verde Mint escuro -->
-        <item name="colorAccent">#00FF88</item>         <!-- Verde Mint para destaques -->
+        <!-- CORES BÁSICAS COMPATÍVEIS COM API 22 -->
+        <item name="colorPrimary">@color/vuzix_mint_green</item>
+        <item name="colorPrimaryDark">@color/vuzix_mint_dark</item>
+        <item name="colorAccent">@color/vuzix_mint_green</item>
         
-        <!-- TEXTO: MINT GREEN + WHITE APENAS -->
-        <item name="android:textColorPrimary">#FFFFFF</item>    <!-- WHITE para texto principal -->
-        <item name="android:textColorSecondary">#00FF88</item>  <!-- MINT GREEN para texto secundário -->
-        
-        <!-- BACKGROUND: BLACK = TOTALMENTE TRANSPARENTE -->
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="colorSurface">@android:color/transparent</item>
-        <item name="colorOnSurface">#FFFFFF</item>              <!-- WHITE sobre transparente -->
-        <item name="colorOnPrimary">#000000</item>              <!-- BLACK sobre MINT GREEN -->
+        <!-- BACKGROUND TRANSPARENTE PARA HUD -->
+        <item name="android:windowBackground">@color/vuzix_background</item>
         
         <!-- CONFIGURAÇÕES HUD -->
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">false</item>
+        
+        <!-- TEXT COLORS -->
+        <item name="android:textColorPrimary">@color/vuzix_text_primary</item>
+        <item name="android:textColorSecondary">@color/vuzix_text_secondary</item>
     </style>
 
-    <!-- TEMA HUD ESPECÍFICO PARA VUZIX BLADE -->
-    <style name="HudTheme" parent="Theme.AppCompat.NoActionBar">
-        <!-- MINT GREEN como cor dominante -->
-        <item name="colorPrimary">#00FF88</item>
-        <item name="colorPrimaryDark">#00CC66</item>
-        <item name="colorAccent">#00FF88</item>
-        
-        <!-- APENAS MINT GREEN + WHITE para texto/ícones -->
-        <item name="android:textColorPrimary">#FFFFFF</item>
-        <item name="android:textColorSecondary">#00FF88</item>
-        
-        <!-- BACKGROUND TOTALMENTE TRANSPARENTE -->
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowNoTitle">true</item>
-    </style>
+    <!-- Tema simplificado para API 22 - SEM dependência de HudTheme -->
 
 </resources>
