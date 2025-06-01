@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="@color/vuzix_background"
     tools:context=".MainActivity">
 
-    <!-- SurfaceView para preview da câmera (menor para dar espaço às informações de hábitos) -->
+    <!-- SurfaceView para preview da câmera -->
     <SurfaceView
         android:id="@+id/surface_view"
         android:layout_width="320dp"
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:background="#80000000"
+        android:background="@color/vuzix_background"
         android:orientation="horizontal"
         android:padding="6dp">
 
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="⚪ Pronto"
-            android:textColor="#00FF00"
+            android:textColor="@color/vuzix_white"
             android:textSize="12sp"
             android:textStyle="bold" />
 
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="📡 Desconectado"
-            android:textColor="#FF6600"
+            android:textColor="@color/vuzix_mint_green"
             android:textSize="12sp"
             android:gravity="center" />
 
@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="📊 Hoje: 0/0"
-            android:textColor="#FFFF00"
+            android:textColor="@color/vuzix_white"
             android:textSize="12sp"
             android:gravity="end" />
 
@@ -66,7 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/surface_view"
         android:layout_marginTop="10dp"
-        android:background="#80004400"
+        android:background="@color/vuzix_background"
         android:orientation="vertical"
         android:padding="10dp">
 
@@ -74,7 +74,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="🎯 PRÓXIMA TAREFA"
-            android:textColor="#00FF00"
+            android:textColor="@color/vuzix_mint_green"
             android:textSize="14sp"
             android:textStyle="bold"
             android:gravity="center" />
@@ -85,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Carregando..."
-            android:textColor="#FFFFFF"
+            android:textColor="@color/vuzix_white"
             android:textSize="16sp"
             android:textStyle="bold"
             android:gravity="center" />
@@ -99,7 +99,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/next_task_layout"
         android:layout_marginTop="10dp"
-        android:background="#80000000"
+        android:background="@color/vuzix_background"
         android:orientation="vertical"
         android:padding="10dp">
 
@@ -109,7 +109,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="🚀 Assistente de Rotina"
-            android:textColor="#00FF00"
+            android:textColor="@color/vuzix_mint_green"
             android:textSize="16sp"
             android:textStyle="bold"
             android:gravity="center" />
@@ -121,7 +121,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Sistema inicializado"
-            android:textColor="#CCCCCC"
+            android:textColor="@color/vuzix_white"
             android:textSize="14sp"
             android:gravity="center" />
 
@@ -132,59 +132,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:text=""
-            android:textColor="#FFFF00"
+            android:textColor="@color/vuzix_mint_green"
             android:textSize="12sp"
             android:gravity="center"
-            android:visibility="gone" />
-
-    </LinearLayout>
-
-    <!-- === BOTÕES DE AÇÃO PARA CONCLUSÃO DE TAREFAS === -->
-    <LinearLayout
-        android:id="@+id/task_action_buttons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/feedback_layout"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal"
-        android:padding="6dp"
-        android:visibility="gone">
-
-        <Button
-            android:id="@+id/btn_task_completed"
-            android:layout_width="0dp"
-            android:layout_height="32dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="4dp"
-            android:text="✅ Concluída"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:background="#004400"
-            android:visibility="gone" />
-
-        <Button
-            android:id="@+id/btn_task_continue"
-            android:layout_width="0dp"
-            android:layout_height="32dp"
-            android:layout_weight="1"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp"
-            android:text="⏳ Continuar"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:background="#444400"
-            android:visibility="gone" />
-
-        <Button
-            android:id="@+id/btn_task_skip"
-            android:layout_width="0dp"
-            android:layout_height="32dp"
-            android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:text="⏭ Pular"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:background="#440000"
             android:visibility="gone" />
 
     </LinearLayout>
@@ -194,7 +144,7 @@
         android:id="@+id/test_buttons_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/task_action_buttons"
+        android:layout_below="@id/feedback_layout"
         android:layout_marginTop="8dp"
         android:orientation="horizontal"
         android:padding="6dp">
@@ -206,9 +156,9 @@
             android:layout_weight="1"
             android:layout_marginEnd="4dp"
             android:text="🧪 Teste Tarefa"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/vuzix_white"
             android:textSize="12sp"
-            android:background="#006600" />
+            android:backgroundTint="@color/vuzix_mint_dark" />
 
         <Button
             android:id="@+id/btn_test_notification"
@@ -217,9 +167,9 @@
             android:layout_weight="1"
             android:layout_marginStart="4dp"
             android:text="🔔 Teste Notificação"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/vuzix_white"
             android:textSize="12sp"
-            android:background="#660000" />
+            android:backgroundTint="@color/vuzix_mint_dark" />
 
     </LinearLayout>
 
@@ -228,7 +178,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#80000000"
+        android:background="@color/vuzix_background"
         android:orientation="horizontal"
         android:padding="8dp">
 
@@ -240,9 +190,9 @@
             android:layout_weight="1"
             android:layout_marginEnd="4dp"
             android:text="🎬 Gravar"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/vuzix_white"
             android:textSize="14sp"
-            android:background="#006600" />
+            android:backgroundTint="@color/vuzix_mint_green" />
 
         <!-- Visualizar tarefas -->
         <Button
@@ -253,9 +203,9 @@
             android:layout_marginStart="2dp"
             android:layout_marginEnd="2dp"
             android:text="📋 Tarefas"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/vuzix_white"
             android:textSize="14sp"
-            android:background="#000066" />
+            android:backgroundTint="@color/vuzix_mint_dark" />
 
         <!-- Relatório -->
         <Button
@@ -265,9 +215,9 @@
             android:layout_weight="1"
             android:layout_marginStart="4dp"
             android:text="📊 Relatório"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/vuzix_white"
             android:textSize="14sp"
-            android:background="#660066" />
+            android:backgroundTint="@color/vuzix_mint_dark" />
 
     </LinearLayout>
 

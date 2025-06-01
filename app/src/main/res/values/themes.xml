@@ -1,32 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.VuzixBladeApp" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Cores customizadas para o app -->
-        <item name="colorPrimary">#3F51B5</item>
-        <item name="colorPrimaryDark">#303F9F</item>
-        <item name="colorAccent">#FF4081</item>
+    <!-- ===================================================================== -->
+    <!-- TEMA PRINCIPAL VUZIX BLADE - FOCO EM MINT GREEN + TRANSPARÊNCIA       -->
+    <!-- Background: BLACK (transparente) | Texto/Ícones: MINT GREEN + WHITE   -->
+    <!-- ===================================================================== -->
+
+    <style name="Theme.VuzixBladeApp" parent="Theme.AppCompat.NoActionBar">
+        <!-- COR PRINCIPAL: MINT GREEN VUZIX -->
+        <item name="colorPrimary">#00FF88</item>        <!-- Verde Mint - cor oficial Vuzix -->
+        <item name="colorPrimaryDark">#00CC66</item>    <!-- Verde Mint escuro -->
+        <item name="colorAccent">#00FF88</item>         <!-- Verde Mint para destaques -->
         
-        <!-- Cores para compatibilidade -->
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorSurface">#FFFFFF</item>
-        <item name="colorOnSurface">#000000</item>
+        <!-- TEXTO: MINT GREEN + WHITE APENAS -->
+        <item name="android:textColorPrimary">#FFFFFF</item>    <!-- WHITE para texto principal -->
+        <item name="android:textColorSecondary">#00FF88</item>  <!-- MINT GREEN para texto secundário -->
+        
+        <!-- BACKGROUND: BLACK = TOTALMENTE TRANSPARENTE -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="colorSurface">@android:color/transparent</item>
+        <item name="colorOnSurface">#FFFFFF</item>              <!-- WHITE sobre transparente -->
+        <item name="colorOnPrimary">#000000</item>              <!-- BLACK sobre MINT GREEN -->
+        
+        <!-- CONFIGURAÇÕES HUD -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
     </style>
 
-    <!-- Tema Vuzix HUD (Placeholder para compatibilidade) -->
-    <style name="HudTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Cores otimizadas para display Vuzix Blade -->
-        <item name="colorPrimary">#00FF88</item>        <!-- Verde Mint Vuzix -->
-        <item name="colorPrimaryDark">#00CC66</item>    <!-- Verde escuro -->
-        <item name="colorAccent">#FFFFFF</item>         <!-- Branco para contraste -->
+    <!-- TEMA HUD ESPECÍFICO PARA VUZIX BLADE -->
+    <style name="HudTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- MINT GREEN como cor dominante -->
+        <item name="colorPrimary">#00FF88</item>
+        <item name="colorPrimaryDark">#00CC66</item>
+        <item name="colorAccent">#00FF88</item>
         
-        <!-- Cores de texto para máximo contraste -->
+        <!-- APENAS MINT GREEN + WHITE para texto/ícones -->
         <item name="android:textColorPrimary">#FFFFFF</item>
         <item name="android:textColorSecondary">#00FF88</item>
         
-        <!-- Background transparente para HUD -->
+        <!-- BACKGROUND TOTALMENTE TRANSPARENTE -->
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
     </style>
 
 </resources>

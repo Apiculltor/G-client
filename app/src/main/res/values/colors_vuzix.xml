@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ===================================================================== -->
+    <!-- PALETA SIMPLIFICADA VUZIX BLADE - FOCO EM MINT GREEN + TRANSPARÊNCIA  -->
+    <!-- ===================================================================== -->
+
+    <!-- CORES PRINCIPAIS: APENAS MINT GREEN E WHITE -->
+    <color name="vuzix_mint_green">#00FF88</color>      <!-- COR PRINCIPAL do Vuzix Blade -->
+    <color name="vuzix_mint_dark">#00CC66</color>       <!-- MINT GREEN escuro para variações -->
+    <color name="vuzix_white">#FFFFFF</color>           <!-- WHITE para contraste máximo -->
+    
+    <!-- BACKGROUND: BLACK = TRANSPARENTE -->
+    <color name="vuzix_background">@android:color/transparent</color>
+    <color name="vuzix_surface">@android:color/transparent</color>
+    
+    <!-- TEXTO E ÍCONES: APENAS MINT GREEN + WHITE -->
+    <color name="vuzix_text_primary">#FFFFFF</color>    <!-- WHITE para texto principal -->
+    <color name="vuzix_text_secondary">#00FF88</color>  <!-- MINT GREEN para texto secundário -->
+    <color name="vuzix_icon_primary">#FFFFFF</color>    <!-- WHITE para ícones principais -->
+    <color name="vuzix_icon_secondary">#00FF88</color>  <!-- MINT GREEN para ícones secundários -->
+    
+    <!-- ESTADOS: usando variações de MINT GREEN + WHITE -->
+    <color name="vuzix_success">#00FF88</color>         <!-- MINT GREEN para sucesso -->
+    <color name="vuzix_active">#00FF88</color>          <!-- MINT GREEN para elementos ativos -->
+    <color name="vuzix_inactive">#808080</color>        <!-- Cinza apenas para elementos desabilitados -->
+    
+    <!-- ALERTAS: Usar apenas quando necessário -->
+    <color name="vuzix_warning">#FFEB3B</color>         <!-- YELLOW apenas para avisos críticos -->
+    <color name="vuzix_error">#F44336</color>           <!-- RED apenas para erros críticos -->
+
+</resources>
