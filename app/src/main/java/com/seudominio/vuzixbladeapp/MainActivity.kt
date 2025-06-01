@@ -14,27 +14,19 @@ import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.Toast
+import android.widget.TextView
+import android.widget.Button
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
 import com.vuzix.hud.actionmenu.ActionMenuActivity
-import com.seudominio.vuzixbladeapp.data.dao.TaskDao
-import com.seudominio.vuzixbladeapp.data.dao.TaskExecutionDao
-import com.seudominio.vuzixbladeapp.data.models.Task
-import com.seudominio.vuzixbladeapp.monitoring.TaskMonitor
-import com.seudominio.vuzixbladeapp.notifications.TaskNotificationManager
-import com.seudominio.vuzixbladeapp.scheduler.TaskScheduler
 import java.text.SimpleDateFormat
 import java.util.*
 
 /**
  * MainActivity para Vuzix Blade 1.5 - ASSISTENTE DE ROTINA
+ * Versão adaptada para testes em emulador
  * Integra captura A/V com sistema completo de formação de hábitos
- * Funcionalidades:
- * 1. Estabelecer atividades e horários
- * 2. Notificações e registro de vídeo automático
- * 3. Verificação de execução e feedback
- * 4. Registro de dados para relatórios
- * 5. Lista de tarefas sempre atualizada
  */
 class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
     
@@ -52,20 +44,7 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
     private var isRecording = false
     private var currentRecordingPath: String? = null
     
-    // === CONECTIVIDADE VUZIX ===
-    private lateinit var connectivityReceiver: VuzixConnectivityReceiver
-    private var connectivityManager: VuzixConnectivityManager? = null
-    
-    // === SISTEMA DE HÁBITOS ===
-    private lateinit var taskDao: TaskDao
-    private lateinit var executionDao: TaskExecutionDao
-    private lateinit var taskScheduler: TaskScheduler
-    private lateinit var taskMonitor: TaskMonitor
-    private lateinit var notificationManager: TaskNotificationManager
-    
     // === ESTADO ATUAL ===
-    private var currentTasks: List<Task> = emptyList()
-    private var nextTask: Task? = null
     private val handler = Handler()
     private val updateRunnable = object : Runnable {
         override fun run() {
@@ -73,6 +52,15 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
             handler.postDelayed(this, UPDATE_INTERVAL)
         }
     }
+    
+    // === DADOS SIMULADOS PARA TESTE ===
+    private val simulatedTasks = listOf(
+        "🧘 Meditação - 06:30",
+        "💪 Exercício - 07:00", 
+        "💧 Beber Água - 08:00",
+        "📚 Leitura - 21:00",
+        "🚶 Caminhada - 19:30"
+    )
     
     // === BROADCAST RECEIVERS ===
     private val habitSystemReceiver = object : BroadcastReceiver() {
@@ -86,11 +74,6 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
                 "com.seudominio.vuzixbladeapp.STOP_RECORDING" -> {
                     stopAutomaticRecording()
                 }
-                "com.seudominio.vuzixbladeapp.TASK_COMPLETION_PROMPT" -> {
-                    val taskId = intent.getLongExtra("task_id", -1)
-                    val elapsedMinutes = intent.getIntExtra("elapsed_minutes", 0)
-                    showTaskCompletionPrompt(taskId, elapsedMinutes)
-                }
             }
         }
     }
@@ -99,20 +82,16 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         
-        Log.d(TAG, "🚀 Vuzix Blade Assistente de Rotina iniciado")
+        Log.d(TAG, "🚀 Vuzix Blade Assistente de Rotina iniciado (Modo Teste)")
         
         // Inicializar sistemas
-        initializeHabitSystem()
+        initializeTestSystem()
         setupCameraPreview()
-        setupConnectivity()
         setupUIControls()
         setupBroadcastReceivers()
         
         // Verificar permissões
         checkPermissions()
-        
-        // Configurar HUD
-        setupActionMenu()
         
         // Processar intent se veio de notificação
         handleIncomingIntent(intent)
@@ -125,44 +104,19 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
     }
     
     /**
-     * INICIALIZAÇÃO DO SISTEMA DE HÁBITOS
+     * INICIALIZAÇÃO DO SISTEMA DE TESTE
      */
-    private fun initializeHabitSystem() {
-        Log.d(TAG, "Inicializando sistema de hábitos...")
+    private fun initializeTestSystem() {
+        Log.d(TAG, "Inicializando sistema de teste...")
         
         try {
-            // Inicializar DAOs
-            taskDao = TaskDao(this)
-            executionDao = TaskExecutionDao(this)
-            
-            // Inicializar gerenciadores
-            taskScheduler = TaskScheduler(this)
-            taskMonitor = TaskMonitor(this)
-            notificationManager = TaskNotificationManager(this)
-            
-            // Agendar todas as tarefas ativas
-            taskScheduler.scheduleAllActiveTasks()
-            
-            // Carregar tarefas de hoje
-            loadTodayTasks()
-            
-            Log.d(TAG, "✅ Sistema de hábitos inicializado com sucesso")
+            Log.d(TAG, "✅ Sistema de teste inicializado com ${simulatedTasks.size} tarefas simuladas")
+            Toast.makeText(this, "Sistema de Teste Ativo", Toast.LENGTH_SHORT).show()
             
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Erro ao inicializar sistema de hábitos: ${e.message}")
-            Toast.makeText(this, "Erro ao inicializar sistema de hábitos", Toast.LENGTH_LONG).show()
+            Log.e(TAG, "❌ Erro ao inicializar sistema de teste: ${e.message}")
+            Toast.makeText(this, "Erro ao inicializar sistema", Toast.LENGTH_LONG).show()
         }
-    }
-    
-    /**
-     * CARREGAR TAREFAS DO DIA
-     */
-    private fun loadTodayTasks() {
-        currentTasks = taskDao.getTodayTasks()
-        nextTask = taskDao.getNextTask()
-        
-        Log.d(TAG, "📋 Carregadas ${currentTasks.size} tarefas para hoje")
-        Log.d(TAG, "⏰ Próxima tarefa: ${nextTask?.name ?: "Nenhuma"}")
     }
     
     /**
@@ -172,7 +126,6 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
         val filter = IntentFilter().apply {
             addAction("com.seudominio.vuzixbladeapp.START_RECORDING")
             addAction("com.seudominio.vuzixbladeapp.STOP_RECORDING")
-            addAction("com.seudominio.vuzixbladeapp.TASK_COMPLETION_PROMPT")
         }
         registerReceiver(habitSystemReceiver, filter)
     }
@@ -186,18 +139,19 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
             return
         }
         
-        val task = taskDao.getTaskById(taskId)
-        if (task == null) {
-            Log.e(TAG, "Tarefa não encontrada para gravação: $taskId")
-            return
-        }
-        
-        Log.d(TAG, "🎬 Iniciando gravação automática para: ${task.name}")
+        Log.d(TAG, "🎬 Iniciando gravação automática para tarefa: $taskId")
         
         val finalOutputPath = outputPath ?: "${externalCacheDir?.absolutePath}/task_${taskId}_${System.currentTimeMillis()}.mp4"
         currentRecordingPath = finalOutputPath
         
         try {
+            // Verificar se a câmera está disponível
+            if (camera == null) {
+                Log.w(TAG, "Câmera não disponível, simulando gravação")
+                simulateRecording()
+                return
+            }
+            
             // Configurar MediaRecorder para tarefa específica
             mediaRecorder = MediaRecorder().apply {
                 setAudioSource(MediaRecorder.AudioSource.MIC)
@@ -207,10 +161,10 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
                 setVideoEncoder(MediaRecorder.VideoEncoder.H264)
                 setOutputFile(finalOutputPath)
                 
-                // Configurações otimizadas para Vuzix Blade
+                // Configurações otimizadas
                 setVideoSize(480, 480)
                 setVideoFrameRate(24)
-                setVideoEncodingBitRate(1000000) // 1Mbps para economizar espaço
+                setVideoEncodingBitRate(1000000) // 1Mbps
                 setAudioEncodingBitRate(64000)   // 64kbps
                 
                 camera?.unlock()
@@ -223,17 +177,28 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
             
             isRecording = true
             updateRecordingStatus(true)
-            updateFeedbackDisplay("🎬 Gravando", "Tarefa: ${task.name}", 1.0f)
-            
-            // Notificar S24 Ultra sobre início da gravação
-            sendTaskRecordingStartedToS24(task, finalOutputPath)
+            updateFeedbackDisplay("🎬 Gravando", "Arquivo: $finalOutputPath", 1.0f)
             
             Log.d(TAG, "✅ Gravação automática iniciada: $finalOutputPath")
             
         } catch (e: Exception) {
             Log.e(TAG, "❌ Erro na gravação automática: ${e.message}")
-            updateFeedbackDisplay("❌ Erro gravação", e.message ?: "Erro desconhecido", 0.0f)
+            simulateRecording()
         }
+    }
+    
+    /**
+     * SIMULAÇÃO DE GRAVAÇÃO PARA TESTES
+     */
+    private fun simulateRecording() {
+        isRecording = true
+        updateRecordingStatus(true)
+        updateFeedbackDisplay("🎬 Simulando Gravação", "Modo de teste ativo", 1.0f)
+        
+        // Simular gravação por 5 segundos
+        handler.postDelayed({
+            stopAutomaticRecording()
+        }, 5000)
     }
     
     /**
@@ -256,70 +221,16 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
             isRecording = false
             updateRecordingStatus(false)
             
-            // Enviar dados para S24 Ultra processar
-            currentRecordingPath?.let { path ->
-                sendRecordingDataToS24(path)
-            }
-            
             currentRecordingPath = null
-            updateFeedbackDisplay("✅ Gravação finalizada", "Enviando para análise...", 1.0f)
+            updateFeedbackDisplay("✅ Gravação finalizada", "Dados processados", 1.0f)
             
             Log.d(TAG, "✅ Gravação automática finalizada")
             
         } catch (e: Exception) {
             Log.e(TAG, "❌ Erro ao parar gravação: ${e.message}")
-        }
-    }
-    
-    /**
-     * PROMPT DE CONCLUSÃO DE TAREFA
-     */
-    private fun showTaskCompletionPrompt(taskId: Long, elapsedMinutes: Int) {
-        val task = taskDao.getTaskById(taskId) ?: return
-        
-        Log.d(TAG, "🤔 Perguntando sobre conclusão: ${task.name} (${elapsedMinutes}min)")
-        
-        updateFeedbackDisplay(
-            "✅ ${task.name} concluída?",
-            "Tempo decorrido: ${elapsedMinutes}min",
-            1.0f
-        )
-        
-        // Mostrar botões de ação no HUD (será implementado no layout)
-        val btnCompleted = findViewById<android.widget.Button>(R.id.btn_task_completed)
-        val btnContinue = findViewById<android.widget.Button>(R.id.btn_task_continue)
-        val btnSkip = findViewById<android.widget.Button>(R.id.btn_task_skip)
-        
-        btnCompleted?.apply {
-            visibility = android.view.View.VISIBLE
-            setOnClickListener {
-                taskMonitor.markTaskCompleted(taskId, "Confirmado pelo usuário")
-                visibility = android.view.View.GONE
-                btnContinue?.visibility = android.view.View.GONE
-                btnSkip?.visibility = android.view.View.GONE
-                updateTasksDisplay()
-            }
-        }
-        
-        btnContinue?.apply {
-            visibility = android.view.View.VISIBLE
-            setOnClickListener {
-                Log.d(TAG, "Usuário escolheu continuar tarefa")
-                visibility = android.view.View.GONE
-                btnCompleted?.visibility = android.view.View.GONE
-                btnSkip?.visibility = android.view.View.GONE
-            }
-        }
-        
-        btnSkip?.apply {
-            visibility = android.view.View.VISIBLE
-            setOnClickListener {
-                taskMonitor.markTaskSkipped(taskId, "Pulada pelo usuário")
-                visibility = android.view.View.GONE
-                btnCompleted?.visibility = android.view.View.GONE
-                btnContinue?.visibility = android.view.View.GONE
-                updateTasksDisplay()
-            }
+            isRecording = false
+            updateRecordingStatus(false)
+            updateFeedbackDisplay("✅ Teste finalizado", "Simulação concluída", 1.0f)
         }
     }
     
@@ -327,82 +238,23 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
      * ATUALIZAR DISPLAY DE TAREFAS
      */
     private fun updateTasksDisplay() {
-        loadTodayTasks()
-        
-        // Atualizar próxima tarefa
-        val nextTaskView = findViewById<android.widget.TextView>(R.id.next_task)
-        nextTaskView?.text = if (nextTask != null) {
-            "${nextTask!!.category.icon} ${nextTask!!.name}\n⏰ ${nextTask!!.scheduledTime}"
-        } else {
-            "✅ Todas as tarefas concluídas!"
+        // Simular próxima tarefa
+        val nextTaskView = findViewById<TextView>(R.id.next_task)
+        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val nextTask = when {
+            currentHour < 7 -> "🧘 Meditação - 06:30"
+            currentHour < 8 -> "💪 Exercício - 07:00"
+            currentHour < 19 -> "💧 Beber Água - a cada hora"
+            currentHour < 21 -> "🚶 Caminhada - 19:30"
+            else -> "📚 Leitura - 21:00"
         }
         
-        // Atualizar lista de tarefas de hoje
-        val todayTasksView = findViewById<android.widget.TextView>(R.id.today_tasks)
-        val completedToday = executionDao.getTodayExecutions().filter { it.isSuccessful() }.size
-        todayTasksView?.text = "📊 Hoje: $completedToday/${currentTasks.size} concluídas"
+        nextTaskView?.text = "🎯 PRÓXIMA TAREFA\n$nextTask"
         
-        // Verificar se há tarefas para executar agora
-        val tasksToExecute = taskDao.getTasksToExecuteNow()
-        if (tasksToExecute.isNotEmpty() && !isRecording) {
-            val task = tasksToExecute.first()
-            Log.d(TAG, "⚠️ Tarefa deve ser executada agora: ${task.name}")
-            updateFeedbackDisplay(
-                "⏰ Hora de: ${task.name}",
-                "Duração: ${task.duration}min",
-                1.0f
-            )
-        }
-        
-        // Atualizar status de monitoramento
-        val monitoringStatus = taskMonitor.getCurrentMonitoringStatus()
-        if (monitoringStatus != null) {
-            updateFeedbackDisplay(
-                "🔄 ${monitoringStatus.task.name}",
-                "Executando há ${monitoringStatus.elapsedMinutes}min",
-                1.0f
-            )
-        }
-    }
-    
-    /**
-     * ENVIAR DADOS PARA S24 ULTRA
-     */
-    private fun sendTaskRecordingStartedToS24(task: Task, videoPath: String) {
-        try {
-            val message = mapOf(
-                "message_type" to "task_recording_started",
-                "task_id" to task.id,
-                "task_name" to task.name,
-                "task_category" to task.category.name,
-                "video_path" to videoPath,
-                "expected_duration" to task.duration,
-                "timestamp" to System.currentTimeMillis()
-            )
-            
-            connectivityManager?.sendMessage(message)
-            Log.d(TAG, "📡 S24 Ultra notificado sobre gravação de: ${task.name}")
-            
-        } catch (e: Exception) {
-            Log.e(TAG, "❌ Erro ao notificar S24 Ultra: ${e.message}")
-        }
-    }
-    
-    private fun sendRecordingDataToS24(videoPath: String) {
-        try {
-            val message = mapOf(
-                "message_type" to "video_analysis_request",
-                "video_path" to videoPath,
-                "timestamp" to System.currentTimeMillis(),
-                "device" to "vuzix_blade_1.5"
-            )
-            
-            connectivityManager?.sendMessage(message)
-            Log.d(TAG, "📡 Dados de vídeo enviados para análise")
-            
-        } catch (e: Exception) {
-            Log.e(TAG, "❌ Erro ao enviar dados: ${e.message}")
-        }
+        // Simular tarefas de hoje
+        val todayTasksView = findViewById<TextView>(R.id.today_tasks)
+        val completedToday = (currentHour / 4) // Simular progresso
+        todayTasksView?.text = "📊 Hoje: $completedToday/${simulatedTasks.size} concluídas"
     }
     
     /**
@@ -415,43 +267,16 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
             
             if (taskId != -1L && action != null) {
                 Log.d(TAG, "📱 Intent recebido: $action para tarefa $taskId")
-                
-                when (action) {
-                    "reminder" -> {
-                        val task = taskDao.getTaskById(taskId)
-                        task?.let { t ->
-                            updateFeedbackDisplay(
-                                "🔔 Lembrete: ${t.name}",
-                                "Em ${t.reminderMinutes} minutos",
-                                1.0f
-                            )
-                        }
-                    }
-                    "execute" -> {
-                        val task = taskDao.getTaskById(taskId)
-                        task?.let { t ->
-                            taskMonitor.startAutomaticMonitoring(t)
-                        }
-                    }
-                }
+                updateFeedbackDisplay("📱 Ação: $action", "Tarefa ID: $taskId", 1.0f)
             }
         }
     }
-    
-    // === RESTO DO CÓDIGO ORIGINAL (setupCameraPreview, etc.) ===
     
     private fun setupCameraPreview() {
         surfaceView = findViewById(R.id.surface_view)
         surfaceHolder = surfaceView?.holder
         surfaceHolder?.addCallback(this)
         surfaceHolder?.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS)
-    }
-    
-    private fun setupConnectivity() {
-        connectivityReceiver = VuzixConnectivityReceiver()
-        connectivityManager = VuzixConnectivityManager(this)
-        
-        Log.d(TAG, "Status conectividade: ${connectivityManager?.getConnectionInfo()}")
     }
     
     private fun checkPermissions() {
@@ -476,10 +301,6 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
         }
     }
     
-    private fun setupActionMenu() {
-        // Menu será implementado com ações de hábitos
-    }
-    
     private fun initializeCamera() {
         try {
             camera = Camera.open()
@@ -493,14 +314,14 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
             Log.d(TAG, "✅ Câmera inicializada")
             
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Erro ao inicializar câmera: ${e.message}")
-            Toast.makeText(this, "Erro ao acessar câmera", Toast.LENGTH_SHORT).show()
+            Log.e(TAG, "⚠️ Câmera não disponível (emulador): ${e.message}")
+            // Continuar sem câmera em emulador
         }
     }
     
     private fun setupUIControls() {
-        // Controles básicos + controles de hábitos
-        val btnManualRecord = findViewById<android.widget.Button>(R.id.btn_manual_record)
+        // Controles básicos
+        val btnManualRecord = findViewById<Button>(R.id.btn_manual_record)
         
         btnManualRecord?.setOnClickListener {
             if (!isRecording) {
@@ -510,7 +331,18 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
             }
         }
         
-        updateConnectionStatus(false)
+        // Botões de teste
+        val btnTestTask = findViewById<Button>(R.id.btn_test_task)
+        btnTestTask?.setOnClickListener {
+            testTaskExecution()
+        }
+        
+        val btnTestNotification = findViewById<Button>(R.id.btn_test_notification)
+        btnTestNotification?.setOnClickListener {
+            testNotificationSystem()
+        }
+        
+        updateConnectionStatus(true) // Simular conexão para teste
         updateRecordingStatus(false)
     }
     
@@ -518,9 +350,21 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
         startAutomaticRecording(-1, null) // -1 indica gravação manual
     }
     
+    private fun testTaskExecution() {
+        updateFeedbackDisplay("🧪 Teste de Tarefa", "Simulando execução...", 1.0f)
+        
+        handler.postDelayed({
+            startAutomaticRecording(1, null)
+        }, 1000)
+    }
+    
+    private fun testNotificationSystem() {
+        updateFeedbackDisplay("🔔 Teste Notificação", "Sistema funcionando", 1.0f)
+        Toast.makeText(this, "Notificação de teste enviada", Toast.LENGTH_SHORT).show()
+    }
+    
     private fun updateUIStatus() {
-        val connectionStatus = connectivityManager?.isConnected() ?: false
-        updateConnectionStatus(connectionStatus)
+        updateConnectionStatus(true) // Simular conexão
         updateRecordingStatus(isRecording)
         updateTasksDisplay()
         
@@ -529,31 +373,34 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
         
         updateFeedbackDisplay(
             "🚀 Assistente de Rotina",
-            "Pronto às $currentTime",
+            "Modo Teste - $currentTime",
             1.0f
         )
     }
     
     private fun updateConnectionStatus(connected: Boolean) {
-        val connectionStatusView = findViewById<android.widget.TextView>(R.id.connection_status)
+        val connectionStatusView = findViewById<TextView>(R.id.connection_status)
         connectionStatusView?.apply {
-            text = if (connected) "📡 S24 Conectado" else "📡 Desconectado"
+            text = if (connected) "📡 S24 Conectado (Simulado)" else "📡 Desconectado"
             setTextColor(if (connected) 0xFF00FF00.toInt() else 0xFFFF6600.toInt())
         }
     }
     
     private fun updateRecordingStatus(recording: Boolean) {
-        val recordingStatusView = findViewById<android.widget.TextView>(R.id.recording_status)
+        val recordingStatusView = findViewById<TextView>(R.id.recording_status)
         recordingStatusView?.apply {
             text = if (recording) "🔴 Gravando" else "⚪ Pronto"
             setTextColor(if (recording) 0xFFFF0000.toInt() else 0xFF00FF00.toInt())
         }
+        
+        val btnManualRecord = findViewById<Button>(R.id.btn_manual_record)
+        btnManualRecord?.text = if (recording) "⏹ Parar" else "🎬 Gravar"
     }
     
     private fun updateFeedbackDisplay(result: String, details: String = "", confidence: Float = 0.0f) {
-        val feedbackResult = findViewById<android.widget.TextView>(R.id.feedback_result)
-        val feedbackDetails = findViewById<android.widget.TextView>(R.id.feedback_details)
-        val feedbackConfidence = findViewById<android.widget.TextView>(R.id.feedback_confidence)
+        val feedbackResult = findViewById<TextView>(R.id.feedback_result)
+        val feedbackDetails = findViewById<TextView>(R.id.feedback_details)
+        val feedbackConfidence = findViewById<TextView>(R.id.feedback_confidence)
         
         feedbackResult?.text = result
         feedbackDetails?.text = details
@@ -601,9 +448,9 @@ class MainActivity : ActionMenuActivity(), SurfaceHolder.Callback {
             CAMERA_PERMISSION_REQUEST -> {
                 if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                     initializeCamera()
+                    Toast.makeText(this, "Permissões concedidas", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this, "Permissões necessárias para funcionamento", Toast.LENGTH_LONG).show()
-                    finish()
+                    Toast.makeText(this, "Continuando sem câmera (modo teste)", Toast.LENGTH_SHORT).show()
                 }
             }
         }

@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.VuzixBladeApp" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.VuzixBladeApp" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Cores customizadas para o app -->
+        <item name="colorPrimary">#3F51B5</item>
+        <item name="colorPrimaryDark">#303F9F</item>
+        <item name="colorAccent">#FF4081</item>
+        
+        <!-- Cores para compatibilidade -->
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnSurface">#000000</item>
+    </style>
+
+    <!-- Tema Vuzix HUD (Placeholder para compatibilidade) -->
+    <style name="HudTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Cores otimizadas para display Vuzix Blade -->
+        <item name="colorPrimary">#00FF88</item>        <!-- Verde Mint Vuzix -->
+        <item name="colorPrimaryDark">#00CC66</item>    <!-- Verde escuro -->
+        <item name="colorAccent">#FFFFFF</item>         <!-- Branco para contraste -->
+        
+        <!-- Cores de texto para máximo contraste -->
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorSecondary">#00FF88</item>
+        
+        <!-- Background transparente para HUD -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
 </resources>

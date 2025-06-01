@@ -17,7 +17,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url = uri('https://jitpack.io') }  // Para SDKs Vuzix
+        maven { url = uri('https://jitpack.io') }
     }
 }
 

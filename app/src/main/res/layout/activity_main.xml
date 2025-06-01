@@ -189,6 +189,40 @@
 
     </LinearLayout>
 
+    <!-- === BOTÕES DE TESTE === -->
+    <LinearLayout
+        android:id="@+id/test_buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/task_action_buttons"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:padding="6dp">
+
+        <Button
+            android:id="@+id/btn_test_task"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="🧪 Teste Tarefa"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:background="#006600" />
+
+        <Button
+            android:id="@+id/btn_test_notification"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="🔔 Teste Notificação"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:background="#660000" />
+
+    </LinearLayout>
+
     <!-- === CONTROLES PRINCIPAIS (BOTTOM) === -->
     <LinearLayout
         android:layout_width="match_parent"
