@@ -38,3 +38,31 @@ class VuzixConnectivityStub(private val context: Context) {
      */
     fun isLinked(): Boolean {
         Log.d(TAG, "🤝 Status pareamento: $isLinkedSimulation")
+        return isLinkedSimulation
+    }
+    
+    /**
+     * Simula envio de mensagem
+     */
+    fun sendMessage(message: String): Boolean {
+        Log.d(TAG, "📤 Enviando mensagem: $message")
+        return true
+    }
+    
+    /**
+     * Simula conexão
+     */
+    fun connect(): Boolean {
+        Log.d(TAG, "🔗 Conectando...")
+        isConnectedSimulation = true
+        return true
+    }
+    
+    /**
+     * Simula desconexão
+     */
+    fun disconnect() {
+        Log.d(TAG, "⚡ Desconectando...")
+        isConnectedSimulation = false
+    }
+}

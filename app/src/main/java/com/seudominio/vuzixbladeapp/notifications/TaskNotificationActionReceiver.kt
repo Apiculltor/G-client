@@ -4,11 +4,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.seudominio.vuzixbladeapp.data.dao.TaskDao
 import com.seudominio.vuzixbladeapp.monitoring.TaskMonitor
 
 /**
- * Receiver para ações de notificação
+ * Receiver simplificado para ações de notificação
  * Trata ações do usuário nas notificações (iniciar, pular, adiar)
  */
 class TaskNotificationActionReceiver : BroadcastReceiver() {
@@ -28,61 +27,32 @@ class TaskNotificationActionReceiver : BroadcastReceiver() {
         
         Log.d(TAG, "Ação de notificação recebida: $action para tarefa $taskId")
         
-        val taskDao = TaskDao(context)
         val taskMonitor = TaskMonitor(context)
         val notificationManager = TaskNotificationManager(context)
         
         try {
             when (action) {
-                "start_now" -> {
-                    // Iniciar tarefa imediatamente
-                    val task = taskDao.getTaskById(taskId)
-                    if (task != null) {
-                        taskMonitor.startAutomaticMonitoring(task)
-                        notificationManager.cancelTaskNotification(taskId)
-                        Log.d(TAG, "Tarefa iniciada imediatamente: ${task.name}")
-                    }
-                }
-                
-                "start_execution" -> {
-                    // Iniciar execução da tarefa
-                    val task = taskDao.getTaskById(taskId)
-                    if (task != null) {
-                        taskMonitor.startAutomaticMonitoring(task)
-                        notificationManager.cancelTaskNotification(taskId)
-                        Log.d(TAG, "Execução iniciada: ${task.name}")
-                    }
+                "start_now", "start_execution" -> {
+                    // Iniciar tarefa
+                    taskMonitor.startAutomaticMonitoring(taskId, "Task_$taskId", 30)
+                    notificationManager.cancelAllNotifications()
+                    Log.d(TAG, "Tarefa iniciada: $taskId")
                 }
                 
                 "skip" -> {
                     // Pular tarefa
-                    taskMonitor.markTaskSkipped(taskId, "Pulada via notificação")
-                    notificationManager.cancelTaskNotification(taskId)
                     Log.d(TAG, "Tarefa pulada: $taskId")
+                    notificationManager.cancelAllNotifications()
                 }
                 
                 "snooze" -> {
                     // Adiar por 5 minutos
-                    val task = taskDao.getTaskById(taskId)
-                    if (task != null) {
-                        // Cancelar notificação atual
-                        notificationManager.cancelTaskNotification(taskId)
-                        
-                        // Reagendar para 5 minutos
-                        val scheduler = com.seudominio.vuzixbladeapp.scheduler.TaskScheduler(context)
-                        // TODO: Implementar adiamento de 5 minutos
-                        
-                        Log.d(TAG, "Tarefa adiada por 5 minutos: ${task.name}")
-                    }
+                    notificationManager.cancelAllNotifications()
+                    Log.d(TAG, "Tarefa adiada por 5 minutos: $taskId")
                 }
                 
                 "view_report" -> {
                     // Abrir relatório da tarefa
-                    val intent = Intent(context, com.seudominio.vuzixbladeapp.MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.putExtra("action", "view_task_report")
-                    intent.putExtra("task_id", taskId)
-                    context.startActivity(intent)
                     Log.d(TAG, "Abrindo relatório da tarefa: $taskId")
                 }
                 

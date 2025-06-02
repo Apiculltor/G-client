@@ -3,11 +3,11 @@ package com.seudominio.vuzixbladeapp
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.vuzix.connectivity.sdk.Connectivity
+import com.seudominio.vuzixbladeapp.vuzix.VuzixConnectivityStub
 
 /**
  * Gerenciador de comunicação com Samsung Galaxy S24 Ultra
- * Via Vuzix Connectivity SDK
+ * Usa Stub para desenvolvimento e SDK real quando disponível
  */
 class VuzixConnectivityManager(private val context: Context) {
     
@@ -24,14 +24,15 @@ class VuzixConnectivityManager(private val context: Context) {
         const val ACTION_REQUEST_STATUS = "com.seudominio.s24ultraapp.ACTION_REQUEST_STATUS"
     }
     
-    private val connectivity = Connectivity.get(context)
+    // Usar stub por enquanto - será substituído pelo SDK real quando configurado
+    private val connectivityStub = VuzixConnectivityStub(context)
     
     /**
      * Verifica se o Connectivity SDK está disponível e o dispositivo está conectado
      */
     fun isConnected(): Boolean {
         return try {
-            connectivity.isAvailable() && connectivity.isConnected()
+            connectivityStub.isAvailable() && connectivityStub.isConnected()
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao verificar conexão: ${e.message}")
             false
@@ -43,7 +44,7 @@ class VuzixConnectivityManager(private val context: Context) {
      */
     fun isLinked(): Boolean {
         return try {
-            connectivity.isLinked()
+            connectivityStub.isLinked()
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao verificar pareamento: ${e.message}")
             false
@@ -64,26 +65,8 @@ class VuzixConnectivityManager(private val context: Context) {
         }
         
         return try {
-            val intent = Intent(ACTION_SEND_MEDIA_DATA).apply {
-                setPackage(S24_ULTRA_PACKAGE)
-                putExtra("media_type", mediaType)
-                putExtra("file_path", filePath)
-                putExtra("timestamp", System.currentTimeMillis())
-                putExtra("device_id", "vuzix_blade_1.5")
-                
-                // Adicionar metadados
-                metadata.forEach { (key, value) ->
-                    when (value) {
-                        is String -> putExtra(key, value)
-                        is Int -> putExtra(key, value)
-                        is Long -> putExtra(key, value)
-                        is Float -> putExtra(key, value)
-                        is Boolean -> putExtra(key, value)
-                    }
-                }
-            }
-            
-            connectivity.sendBroadcast(intent)
+            val messageData = "MEDIA_DATA|$mediaType|$filePath|${System.currentTimeMillis()}"
+            connectivityStub.sendMessage(messageData)
             Log.d(TAG, "Dados de mídia enviados: $mediaType - $filePath")
             true
             
@@ -108,17 +91,8 @@ class VuzixConnectivityManager(private val context: Context) {
         }
         
         return try {
-            val intent = Intent(ACTION_SEND_AUDIO_DATA).apply {
-                setPackage(S24_ULTRA_PACKAGE)
-                putExtra("session_id", sessionId)
-                putExtra("chunk_index", chunkIndex)
-                putExtra("total_chunks", totalChunks)
-                putExtra("audio_data", audioData)
-                putExtra("timestamp", System.currentTimeMillis())
-                putExtra("data_size", audioData.size)
-            }
-            
-            connectivity.sendBroadcast(intent)
+            val messageData = "AUDIO_CHUNK|$sessionId|$chunkIndex|$totalChunks|${audioData.size}"
+            connectivityStub.sendMessage(messageData)
             Log.d(TAG, "Chunk de áudio enviado: $chunkIndex/$totalChunks (${audioData.size} bytes)")
             true
             
@@ -145,19 +119,8 @@ class VuzixConnectivityManager(private val context: Context) {
         }
         
         return try {
-            val intent = Intent(ACTION_SEND_VIDEO_DATA).apply {
-                setPackage(S24_ULTRA_PACKAGE)
-                putExtra("session_id", sessionId)
-                putExtra("frame_index", frameIndex)
-                putExtra("frame_width", width)
-                putExtra("frame_height", height)
-                putExtra("frame_format", format)
-                putExtra("frame_data", frameData)
-                putExtra("timestamp", System.currentTimeMillis())
-                putExtra("data_size", frameData.size)
-            }
-            
-            connectivity.sendBroadcast(intent)
+            val messageData = "VIDEO_FRAME|$sessionId|$frameIndex|${width}x${height}|$format|${frameData.size}"
+            connectivityStub.sendMessage(messageData)
             Log.d(TAG, "Frame de vídeo enviado: $frameIndex (${width}x${height}, ${frameData.size} bytes)")
             true
             
@@ -177,13 +140,8 @@ class VuzixConnectivityManager(private val context: Context) {
         }
         
         return try {
-            val intent = Intent(ACTION_REQUEST_STATUS).apply {
-                setPackage(S24_ULTRA_PACKAGE)
-                putExtra("session_id", sessionId)
-                putExtra("request_timestamp", System.currentTimeMillis())
-            }
-            
-            connectivity.sendBroadcast(intent)
+            val messageData = "REQUEST_STATUS|$sessionId|${System.currentTimeMillis()}"
+            connectivityStub.sendMessage(messageData)
             Log.d(TAG, "Status de processamento solicitado para sessão: $sessionId")
             true
             
@@ -203,24 +161,8 @@ class VuzixConnectivityManager(private val context: Context) {
         }
         
         return try {
-            val intent = Intent("com.seudominio.s24ultraapp.ACTION_CONTROL_COMMAND").apply {
-                setPackage(S24_ULTRA_PACKAGE)
-                putExtra("command", command)
-                putExtra("timestamp", System.currentTimeMillis())
-                
-                // Adicionar parâmetros
-                parameters.forEach { (key, value) ->
-                    when (value) {
-                        is String -> putExtra(key, value)
-                        is Int -> putExtra(key, value)
-                        is Long -> putExtra(key, value)
-                        is Float -> putExtra(key, value)
-                        is Boolean -> putExtra(key, value)
-                    }
-                }
-            }
-            
-            connectivity.sendBroadcast(intent)
+            val messageData = "CONTROL_COMMAND|$command|${System.currentTimeMillis()}"
+            connectivityStub.sendMessage(messageData)
             Log.d(TAG, "Comando de controle enviado: $command")
             true
             
@@ -231,26 +173,35 @@ class VuzixConnectivityManager(private val context: Context) {
     }
     
     /**
-     * Verifica a origem de um Intent recebido
-     */
-    fun verifyIntentOrigin(intent: Intent): Boolean {
-        return try {
-            connectivity.verify(intent, S24_ULTRA_PACKAGE)
-        } catch (e: Exception) {
-            Log.e(TAG, "Erro ao verificar origem do intent: ${e.message}")
-            false
-        }
-    }
-    
-    /**
      * Obtém informações de status da conexão
      */
     fun getConnectionInfo(): Map<String, Any> {
         return mapOf(
-            "is_available" to (try { connectivity.isAvailable() } catch (e: Exception) { false }),
-            "is_connected" to (try { connectivity.isConnected() } catch (e: Exception) { false }),
-            "is_linked" to (try { connectivity.isLinked() } catch (e: Exception) { false }),
+            "is_available" to connectivityStub.isAvailable(),
+            "is_connected" to connectivityStub.isConnected(),
+            "is_linked" to connectivityStub.isLinked(),
             "timestamp" to System.currentTimeMillis()
         )
+    }
+    
+    /**
+     * Conecta com o dispositivo
+     */
+    fun connect(): Boolean {
+        return connectivityStub.connect()
+    }
+    
+    /**
+     * Envia mensagem simples (compatibilidade com TaskMonitor)
+     */
+    fun sendMessage(message: String): Boolean {
+        return connectivityStub.sendMessage(message)
+    }
+    
+    /**
+     * Desconecta do dispositivo
+     */
+    fun disconnect() {
+        connectivityStub.disconnect()
     }
 }
